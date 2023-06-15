@@ -32,11 +32,12 @@ class Cxf8885Test extends CxfJaxWsClientTest {
   void sayHello_1(@Autowired Bus bus) {
 
     int count = 500;
-    HelloWebService client = helloWebService(bus);
-
-    for (int i = 0; i < count; i++) {
-      HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
-      assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+    {
+      HelloWebService client = helloWebService(bus);
+      for (int i = 0; i < count; i++) {
+        HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
+        assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+      }
     }
 
     try {
@@ -87,7 +88,7 @@ class Cxf8885Test extends CxfJaxWsClientTest {
         .toList();
 
     // currently, each invocation of super.testHello() leaves us with an active SelectorManager Thread.
-    assertThat(threads).hasSizeGreaterThanOrEqualTo(count + 1);
+    assertThat(threads).hasSizeGreaterThanOrEqualTo(count);
 
     // FIXME
     // assertThat(threads).isEmpty();
