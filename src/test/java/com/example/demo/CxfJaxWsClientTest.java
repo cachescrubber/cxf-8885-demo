@@ -12,20 +12,5 @@ import org.apache.cxf.jaxws.spring.JaxWsProxyFactoryBeanDefinitionParser;
 
 class CxfJaxWsClientTest {
 
-  HelloWebService helloWebService(Bus bus) {
-    JaxWsProxyFactoryBeanDefinitionParser.JAXWSSpringClientProxyFactoryBean factoryBean = new JaxWsProxyFactoryBeanDefinitionParser.JAXWSSpringClientProxyFactoryBean();
-    factoryBean.setServiceClass(HelloWebService.class);
-    factoryBean.setBus(bus);
-    factoryBean.setFeatures(List.of(new LoggingFeature()));
-    factoryBean.setAddress("http://localhost:8080/services/hello");
-    return (HelloWebService) factoryBean.create();
-  }
-
-  void sayHello(Bus bus) {
-
-    HelloWebService client = helloWebService(bus);
-    HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
-    assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
-  }
 
 }
