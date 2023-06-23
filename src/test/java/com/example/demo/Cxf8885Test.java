@@ -74,7 +74,7 @@ class Cxf8885Test {
     }
 
     try {
-      Thread.sleep(5000L);
+      Thread.sleep(30000L);
     } catch (InterruptedException e) {
       ;
     }
