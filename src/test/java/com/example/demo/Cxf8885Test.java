@@ -29,7 +29,7 @@ class Cxf8885Test {
 
   @Test
   @Order(1)
-  void sayHello_1(@Autowired Bus bus) {
+  void sayHello_1(@Autowired Bus bus) throws Exception {
 
     int count = 500;
     {
@@ -37,6 +37,9 @@ class Cxf8885Test {
       for (int i = 0; i < count; i++) {
         HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
         assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+      }
+      if (client instanceof AutoCloseable autoCloseable) {
+        autoCloseable.close();
       }
     }
 
@@ -63,7 +66,7 @@ class Cxf8885Test {
 
   @Test
   @Order(2)
-  void sayHello_2(@Autowired Bus bus) {
+  void sayHello_2(@Autowired Bus bus) throws Exception {
 
     int count = 500;
 
@@ -71,6 +74,9 @@ class Cxf8885Test {
       HelloWebService client = helloWebService(bus);
       HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
       assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+      if (client instanceof AutoCloseable autoCloseable) {
+        autoCloseable.close();
+      }
     }
 
     try {
