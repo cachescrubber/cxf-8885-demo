@@ -42,7 +42,6 @@ class Cxf8885Test {
         autoCloseable.close();
       }
     }
-
     try {
       Thread.sleep(5000L);
     } catch (InterruptedException e) {
@@ -65,7 +64,41 @@ class Cxf8885Test {
 
   @Test
   @Order(2)
-  void sayHello_2(@Autowired Bus bus) throws Exception {
+  void sayHello_2_no_close(@Autowired Bus bus) throws Exception {
+
+    int count = 500;
+    {
+      HelloWebService client = helloWebService(bus);
+      for (int i = 0; i < count; i++) {
+        HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
+        assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+      }
+      //NOTE: client is not closed()
+    }
+
+    try {
+      Thread.sleep(5000L);
+    } catch (InterruptedException e) {
+      ;
+    }
+
+    System.gc();
+
+    List<Thread> threads = Thread.getAllStackTraces().keySet().stream()
+        .filter(thread -> thread.getName().startsWith("HttpClient-"))
+        .filter(thread -> thread.getName().endsWith("-SelectorManager"))
+        .filter(Thread::isAlive)
+        .toList();
+
+    // currently, each invocation of super.testHello() leaves us with an active SelectorManager Thread.
+    // assertThat(threads).hasSize(1);
+
+    assertThat(threads).isEmpty();
+  }
+
+  @Test
+  @Order(200)
+  void sayHello_200(@Autowired Bus bus) throws Exception {
 
     int count = 500;
 
