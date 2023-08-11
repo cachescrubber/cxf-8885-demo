@@ -58,10 +58,9 @@ class Cxf8885Test {
         .toList();
 
     // currently, each invocation of super.testHello() leaves us with an active SelectorManager Thread.
-    assertThat(threads).hasSize(1);
+    // assertThat(threads).hasSize(1);
 
-    // FIXME
-    // assertThat(threads).isEmpty();
+    assertThat(threads).isEmpty();
   }
 
   @Test
@@ -94,10 +93,8 @@ class Cxf8885Test {
         .toList();
 
     // currently, each invocation of super.testHello() leaves us with an active SelectorManager Thread.
-    assertThat(threads).hasSizeGreaterThanOrEqualTo(count);
-
-    // FIXME
-    // assertThat(threads).isEmpty();
+    //assertThat(threads).hasSizeGreaterThanOrEqualTo(count);
+    assertThat(threads).isEmpty();
   }
 
 }
