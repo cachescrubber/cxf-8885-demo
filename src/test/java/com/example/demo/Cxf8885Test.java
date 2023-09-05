@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxws.spring.JaxWsProxyFactoryBeanDefinitionParser;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ class Cxf8885Test {
     factoryBean.setFeatures(List.of(new LoggingFeature()));
     factoryBean.setAddress("http://localhost:8080/services/hello");
     return (HelloWebService) factoryBean.create();
+  }
+
+  @BeforeAll
+  static void printOpenFiles() {
+    DemoApplicationTest.printOpenFileDescriptorCount();
   }
 
   @Test
@@ -64,7 +70,7 @@ class Cxf8885Test {
 
   @Test
   @Order(2)
-  void sayHello_2_no_close(@Autowired Bus bus) throws Exception {
+  void sayHello_2_noClose(@Autowired Bus bus) throws Exception {
 
     int count = 500;
     {
@@ -109,6 +115,38 @@ class Cxf8885Test {
       if (client instanceof AutoCloseable autoCloseable) {
         autoCloseable.close();
       }
+    }
+
+    try {
+      Thread.sleep(5000L);
+    } catch (InterruptedException e) {
+      ;
+    }
+
+    System.gc();
+
+    List<Thread> threads = Thread.getAllStackTraces().keySet().stream()
+        .filter(thread -> thread.getName().startsWith("HttpClient-"))
+        .filter(thread -> thread.getName().endsWith("-SelectorManager"))
+        .filter(Thread::isAlive)
+        .toList();
+
+    // currently, each invocation of super.testHello() leaves us with an active SelectorManager Thread.
+    //assertThat(threads).hasSizeGreaterThanOrEqualTo(count);
+    assertThat(threads).isEmpty();
+  }
+
+  @Test
+  @Order(201)
+  void sayHello_201_perRequest_noClose(@Autowired Bus bus) throws Exception {
+
+    int count = 500;
+
+    for (int i = 0; i < count; i++) {
+      HelloWebService client = helloWebService(bus);
+      HelloResponse helloResponse = client.hello(new HelloRequest("Klaus"));
+      assertThat(helloResponse.getGreeting()).isEqualTo("Hello, Klaus");
+      //NOTE: client is not closed()
     }
 
     try {
